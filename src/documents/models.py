@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -10,5 +11,6 @@ class Document(models.Model):
     title = models.CharField(default = 'Title')
     content = models.TextField(default = 'Content')
     active = models.BooleanField(default=True)
+    active_at = models.DateTimeField(auto_now_add=False, auto_now=False, default=timezone.now)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
