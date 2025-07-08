@@ -5,17 +5,18 @@ from documents.models import Document
 @tool
 def list_documents(config: RunnableConfig = None):
     """
-    List all documents in the database.
+    List the most recent 5 documents for the current user.
     """
-    print(config)
-    metadata = config.get('metadata') or config.get('configurable')
-    user_id = metadata.get('user_id')
+    
+    limit = 5
+    configurable = config.get('configurable') or config.get('metadata')
+    user_id = configurable.get('user_id')
     if user_id is None:
         raise Exception("error: User ID is required in the configuration.")
-    query_set = Document.objects.filter(owner_id = user_id, active=True)
+    query_set = Document.objects.filter(owner_id = user_id, active=True).order_by("-created_at")
     response_data = []
 
-    for doc in query_set:
+    for doc in query_set[:limit]:
         response_data.append(
             {
                 "id": doc.id,
@@ -36,8 +37,8 @@ def get_document(document_id: int, config: RunnableConfig = None):
     Get a document by its ID for a given user.
     """
 
-    metadata = config.get('metadata') or config.get('configurable')
-    user_id = metadata.get('user_id')
+    configurable = config.get('configurable') or config.get('metadata')
+    user_id = configurable.get('user_id')
     if user_id is None:
         raise Exception("error: User ID is required in the configuration.")
     try:
@@ -57,3 +58,8 @@ def get_document(document_id: int, config: RunnableConfig = None):
     }
 
     return response_data
+
+document_tools = [
+    list_documents,
+    get_document
+]
